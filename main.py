@@ -1,86 +1,97 @@
-import sys
-import random
-import pygame as pyg
+import random, pygame, sys
 from pygame.locals import *
 from snake import *
 from food import Food
 
-pyg.init()
-PL2 = False
-HEIGHT, WIDTH = 800, 600
-FPS = 15
-FPSCLOCK = pyg.time.Clock()
-screen = pyg.display.set_mode((HEIGHT, WIDTH))
-canvas = pyg.Surface((WIDTH, HEIGHT))
 
-pyg.display.set_caption('Snake Game by shrengers')
+class Game:
 
-active_snakes = []
+    def __init__(self, w, h):
+        self.width = w
+        self.height = h
+        self.food = Food(w/2, h/2)
+        self.player = Snake(40, 40)
+        self.player2 = Snake(100,100)
+        self.canvas = Canvas(self.width, self.height, "Testing...")
 
-player1 = Snake(HEIGHT/2, WIDTH/2, screen, colour=(255, 255, 255))
-active_snakes.append(player1)
-food = Food(random.randint(1, 39)*20, random.randint(1, 29)*20, screen)
+    def run(self):
+        clock = pygame.time.Clock()
+        run = True
+        while run:
+            clock.tick(15)
 
-if PL2:
-    player2 = Snake(HEIGHT/2, WIDTH - 40, screen,
-                    colour=(0, 0, 0), facing='left')
-    active_snakes.append(player2)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
 
-while True:
+                if event.type == pygame.K_ESCAPE:
+                    run = False
 
-    for event in pyg.event.get():
-        if event.type == pyg.QUIT:
-            pyg.quit()
-            sys.exit()
-        if event.type == pyg.KEYDOWN:
-            if event.key == pyg.K_LEFT and player1.facing != 'right' and player1.facing != 'left':
-                player1.facing = 'left'
-            elif event.key == pyg.K_RIGHT and player1.facing != 'left' and player1.facing != 'right':
-                player1.facing = 'right'
-            elif event.key == pyg.K_UP and player1.facing != 'down' and player1.facing != 'up':
-                player1.facing = 'up'
-            elif event.key == pyg.K_DOWN and player1.facing != 'up' and player1.facing != 'down':
-                player1.facing = 'down'
+            keys = pygame.key.get_pressed()
 
-            elif event.key == pyg.K_a and player2.facing != 'right' and player2.facing != 'left':
-                player2.facing = 'left'
-            elif event.key == pyg.K_d and player2.facing != 'left' and player2.facing != 'right':
-                player2.facing = 'right'
-            elif event.key == pyg.K_w and player2.facing != 'down' and player2.facing != 'up':
-                player2.facing = 'up'
-            elif event.key == pyg.K_s and player2.facing != 'up' and player2.facing != 'down':
-                player2.facing = 'down'
+            if keys[pygame.K_RIGHT]:
+                if self.player.facing != 1:
+                    self.player.facing = 0
 
-            elif event.key == pyg.K_p:
-                print(player1.length)
-                print([i.length for i in active_snakes])
-            elif event.key == pyg.K_f:
-                food.respawn()
-            elif event.key == pyg.K_r:
-                player1.respawn()
+            if keys[pygame.K_LEFT]:
+                if self.player.facing != 0:
+                    self.player.facing = 1
 
-    for player in active_snakes:
+            if keys[pygame.K_UP]:
+                if self.player.facing != 3:
+                    self.player.facing = 2
 
-        if player.location == food.location:
-            player.eaten += 1
-            food.respawn()
+            if keys[pygame.K_DOWN]:
+                if self.player.facing != 2:
+                    self.player.facing = 3
 
-        elif any(player.location in i.length for i in active_snakes if i != player) or player.location in player.length[:-1]:
-            player.respawn(random.randint(10, 20)*20, random.randint(10, 20)*20)
-            player.facing = 'right'
 
-        if 0 <= player.x < HEIGHT and 0 <= player.y < WIDTH:
-            pass
-        else:
-            player.respawn(random.randint(10, 20)*20, random.randint(10, 20)*20)
-            player.facing = 'right'
+            if self.player.location == self.food.location:
+                self.player.eaten += 1
+                self.food.respawn()
 
-        screen.fill((80, 80, 80))
-        # if player.x % 20 == 0 and player.y % 20 == 0:
-        player.move(player.facing)
+            elif self.player.location in self.player.length[:-1]:
+                self.player.respawn()
 
-        player.draw()
-        food.draw()
+            if 0 <= self.player.x < self.width and 0 <= self.player.y < self.height:
+                pass
+            else:
+                self.player.respawn()
 
-        pyg.display.flip()
-        FPSCLOCK.tick(FPS)
+            self.player.move(self.player.facing)
+
+            # Update Canvas
+            self.canvas.draw_background()
+            self.player.draw(self.canvas.get_canvas())
+            # self.player2.draw(self.canvas.get_canvas())
+            self.food.draw(self.canvas.get_canvas())
+            self.canvas.update()
+
+        pygame.quit()
+
+class Canvas:
+
+    def __init__(self, w, h, name="None"):
+        self.width = w
+        self.height = h
+        self.screen = pygame.display.set_mode((w,h))
+        pygame.display.set_caption(name)
+
+    @staticmethod
+    def update():
+        pygame.display.flip()
+
+    def draw_text(self, text, size, x, y):
+        pygame.font.init()
+        font = pygame.font.SysFont("comicsans", size)
+        render = font.render(text, 1, (0,0,0))
+
+        self.screen.draw(render, (x,y))
+
+    def get_canvas(self):
+        return self.screen
+
+    def draw_background(self):
+        self.screen.fill((255,255,255))
+
+
