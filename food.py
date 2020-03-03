@@ -14,4 +14,4 @@ class Food:
         pygame.draw.rect(g, (255, 0, 0), (self.x, self.y, 20, 20))
 
     def respawn(self, x=39, y=29):
-        self.x, self.y = random.randint(1, x)*20, random.randint(1, y)*20
+        self.x, self.y = random.randint(1, x)*5, random.randint(1, y)*5
