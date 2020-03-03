@@ -23,7 +23,7 @@ class Snake:
 
     def draw(self, g):
 
-        if len(self.length) > 3 + self.eaten:
+        if len(self.length) > 3 * 4 + self.eaten * 4:
             del self.length[0]
 
         self.location = (self.x, self.y)
@@ -36,20 +36,26 @@ class Snake:
     def move(self, direction):
         if direction == 0:
             self.x += 5
-            self.facing = 0
         elif direction == 1:
             self.x -= 5
-            self.facing = 1
         elif direction == 2:
             self.y -= 5
-            self.facing = 2
         elif direction == 3:
             self.y += 5
+
+    def turn(self, direction):
+        if direction == 0:
+            self.facing = 0
+        elif direction == 1:
+            self.facing = 1
+        elif direction == 2:
+            self.facing = 2
+        elif direction == 3:
             self.facing = 3
         
 
     def respawn(self):
-        self.x, self.y = random.randint(10, 20)*5, random.randint(10, 20)*5
+        self.x, self.y = random.randint(10, 20)*20, random.randint(10, 20)*20
         self.length = []
         self.eaten = 0
         self.facing = 0

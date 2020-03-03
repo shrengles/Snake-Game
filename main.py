@@ -13,6 +13,8 @@ class Game:
         self.player = Snake(40, 40)
         self.player2 = Snake(100,100)
         self.canvas = Canvas(self.width, self.height, "Testing...")
+        self.gridwh = 20
+        self.mv = None
 
     def run(self):
         clock = pygame.time.Clock()
@@ -31,19 +33,19 @@ class Game:
 
             if keys[pygame.K_RIGHT]:
                 if self.player.facing != 1:
-                    self.player.facing = 0
+                    self.mv = 0
 
             if keys[pygame.K_LEFT]:
                 if self.player.facing != 0:
-                    self.player.facing = 1
+                    self.mv = 1
 
             if keys[pygame.K_UP]:
                 if self.player.facing != 3:
-                    self.player.facing = 2
+                    self.mv = 2
 
             if keys[pygame.K_DOWN]:
                 if self.player.facing != 2:
-                    self.player.facing = 3
+                    self.mv = 3
 
 
             if self.player.location == self.food.location:
@@ -58,6 +60,17 @@ class Game:
             else:
                 self.player.respawn()
 
+
+            if self.player.x % 20 == 0 and self.player.y % 20 == 0:
+                if self.mv == 0:
+                    self.player.turn(0)
+                elif self.mv == 1:
+                    self.player.turn(1)
+                elif self.mv == 2:
+                    self.player.turn(2)
+                elif self.mv == 3:
+                    self.player.turn(3)
+            
             self.player.move(self.player.facing)
 
             # Update Canvas
